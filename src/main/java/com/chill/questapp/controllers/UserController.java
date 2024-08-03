@@ -2,6 +2,7 @@ package com.chill.questapp.controllers;
 
 import com.chill.questapp.entities.User;
 import com.chill.questapp.repos.UserRepository;
+import com.chill.questapp.services.UserService;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -11,42 +12,33 @@ import java.util.List;
 
 public class UserController {
 
-    private UserRepository userRepository;
-    public UserController(UserRepository userRepository) {
-        this.userRepository = userRepository;
+    private UserService userService;
+    public UserController(UserService userService) {
+        this.userService = userService;
     }
 
     @GetMapping
     public List<User> getAllUsers() {
-        return userRepository.findAll();
+        return userService.getAllUsers();
     }
 
     @PostMapping
     public User createUser(@RequestBody User newUser) {
-        return userRepository.save(newUser);
+        return userService.saveOneUser(newUser);
     }
     @GetMapping(path = "/{userId}")
     public User getUser(@PathVariable Long userId) {
-        return userRepository.findById(userId).orElse(null);
+        return userService.getOneUser(userId);
     }
 
     @PutMapping(path = "/{userId}")
     public User updateUser(@PathVariable Long userId, @RequestBody User newUser) {
-        User exsistUser = userRepository.findById(userId).orElse(null);
-        if (exsistUser != null) {
-            exsistUser.setUserName(newUser.getUserName());
-            exsistUser.setPassword(newUser.getPassword());
-            return userRepository.save(exsistUser);
-
-        }else {
-            System.out.println("User not found");
-            return null;
-        }
+        return userService.updateOneUser(userId, newUser);
     }
 
 
     @DeleteMapping("/{userId}")
     public void deleteUser(@PathVariable Long userId) {
-        userRepository.deleteById(userId);
+        userService.deleteById(userId);
     }
 }
